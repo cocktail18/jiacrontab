@@ -32,6 +32,7 @@ func (d *daemonTask) do(ctx context.Context) {
 		TaskName    string
 		TaskID      uint
 		TaskCommand string
+		TaskAddr    string
 		TaskArgs    string
 		CreatedAt   time.Time
 		Type        string
@@ -57,10 +58,9 @@ func (d *daemonTask) do(ctx context.Context) {
 		cmd := []string{d.task.Command, d.task.Args}
 		stop := false
 		cmdList = append(cmdList, cmd)
-		var logContent []byte
 		logPath := filepath.Join(globalConfig.logPath, "daemon_task")
 		log.Println("daemon exec task_name:", d.task.Name, "task_id", d.task.ID)
-		err := wrapExecScript(ctx, fmt.Sprintf("%d.log", d.task.ID), cmdList, logPath, &logContent)
+		err := wrapExecScript(ctx, fmt.Sprintf("%d.log", d.task.ID), cmdList, logPath, nil)
 		if err != nil {
 			if d.task.MailNotify && d.task.MailTo != "" {
 
@@ -80,6 +80,7 @@ func (d *daemonTask) do(ctx context.Context) {
 					TaskName:    d.task.Name,
 					TaskID:      d.task.ID,
 					TaskCommand: d.task.Command,
+					TaskAddr:    globalConfig.addr,
 					TaskArgs:    d.task.Args,
 					CreatedAt:   d.task.CreatedAt,
 					Type:        "error",
